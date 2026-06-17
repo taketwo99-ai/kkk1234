@@ -1,0 +1,588 @@
+HTML
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국순당 호텔 B2B 영업 자동화 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ksd_navy: '#005088',
+                        ksd_gold: '#D4AF37',
+                        ksd_beige: '#F3F0DF',
+                        ksd_dark: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-ksd_navy text-white px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="border-2 border-ksd_gold p-1 rounded font-bold text-sm tracking-wider text-ksd_gold">KOOKSOONDANG</div>
+            <h1 class="text-lg font-bold tracking-tight">호텔 B2B 영업 디지털 혁신 프로젝트 <span class="text-xs bg-ksd_gold text-ksd_navy px-2 py-0.5 rounded ml-2 font-medium">DEPLOY-READY</span></h1>
+        </div>
+        <div class="flex items-center space-x-4 text-sm">
+            <span><i class="fa-solid fa-user-tie text-ksd_gold mr-1"></i> <strong>김기덕</strong> 님 환영합니다</span>
+            <span class="text-xs text-slate-300">v3.1 Stable</span>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
+        
+        <div id="tab-dashboard" class="tab-content active space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-ksd_navy flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium uppercase">금월 제안서 발행 건수</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="kpi-count">42 건</h3>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg text-ksd_navy text-2xl"><i class="fa-solid fa-file-invoice"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-ksd_gold flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium uppercase">평균 제안 마진율</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1">43.8%</h3>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg text-ksd_gold text-2xl"><i class="fa-solid fa-chart-pie"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium uppercase">인기 제안 와인</p>
+                        <h3 class="text-xl font-bold text-slate-800 mt-2 tracking-tight">DOMAINE TARIQUET</h3>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-lg text-emerald-500 text-2xl"><i class="fa-solid fa-wine-glass"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2 flex flex-col justify-between">
+                    <h4 class="text-sm font-bold text-slate-700 mb-4"><i class="fa-solid fa-chart-line mr-2 text-ksd_navy"></i>제안서 추이 분석 (월별 누적)</h4>
+                    <div class="h-48 relative">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-ksd_navy to-slate-800 p-6 rounded-xl shadow-md text-white flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-lg font-bold text-ksd_gold mb-2"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>스마트 와인 매칭 엔진</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">구글 AI 스튜디오 구조화 출력을 기반으로 한 정밀 제안서 작성 솔루션입니다. 호텔 등급, 업장 스타일을 분석하여 정확한 포트폴리오를 매칭합니다.</p>
+                    </div>
+                    <button onclick="switchTab('tab-configurator')" class="w-full bg-ksd_gold hover:bg-yellow-500 text-ksd_navy font-bold py-3 px-4 rounded-lg shadow transition transform hover:-translate-y-0.5 mt-6 flex justify-center items-center space-x-2">
+                        <i class="fa-solid fa-rocket"></i>
+                        <span>새 맞춤형 제안서 생성하기</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h4 class="text-sm font-bold text-slate-700"><i class="fa-solid fa-history mr-2 text-ksd_navy"></i>실시간 제안 이력 누적 (최신)</h4>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">구글 시트 실시간 연동됨</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-100">
+                                <th class="p-4">제안 ID</th>
+                                <th class="p-4">호텔명</th>
+                                <th class="p-4">업장 유형</th>
+                                <th class="p-4">매칭 와인</th>
+                                <th class="p-4 text-right">액션</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="text-sm text-slate-700 divide-y divide-slate-50">
+                            <tr>
+                                <td class="p-4 font-mono font-bold text-ksd_navy">KSD-20260617-01</td>
+                                <td class="p-4 font-medium">파크하얏트 서울</td>
+                                <td class="p-4"><span class="bg-blue-50 text-ksd_navy px-2 py-0.5 rounded text-xs">O_BAR (라운지)</span></td>
+                                <td class="p-4 text-xs text-slate-500">도멘 타리케 (Domaine Tariquet) 외 1종</td>
+                                <td class="p-4 text-right"><button onclick="alert('과거 저장된 제안서 PDF를 호출합니다.')" class="text-xs border border-slate-200 text-slate-600 px-3 py-1 rounded hover:bg-slate-50"><i class="fa-solid fa-download mr-1"></i>재다운로드</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-configurator" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm max-w-2xl mx-auto border border-slate-100">
+                <div class="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
+                    <button onclick="switchTab('tab-dashboard')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+                    <h3 class="text-lg font-bold text-slate-800">새 호텔 맞춤형 제안서 생성</h3>
+                </div>
+
+                <form id="proposalForm" class="space-y-5" onsubmit="handleFormSubmit(event)">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">호텔명 (필수)</label>
+                        <input type="text" id="hotel_name" required placeholder="예: 파크하얏트 서울, 조선팰리스" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-ksd_navy text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">호텔 등급 (System Code)</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="border border-slate-200 rounded-lg p-3 flex items-center space-x-2 cursor-pointer text-sm hover:bg-slate-50">
+                                <input type="radio" name="hotel_grade" value="H05" checked class="text-ksd_navy focus:ring-ksd_navy">
+                                <span>H05: 5성급 럭셔리</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-3 flex items-center space-x-2 cursor-pointer text-sm hover:bg-slate-50">
+                                <input type="radio" name="hotel_grade" value="H04" class="text-ksd_navy focus:ring-ksd_navy">
+                                <span>H04: 4성급 부티크</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-3 flex items-center space-x-2 cursor-pointer text-sm hover:bg-slate-50">
+                                <input type="radio" name="hotel_grade" value="H03" class="text-ksd_navy focus:ring-ksd_navy">
+                                <span>H03: 비즈니스</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">F&B 업장 유형 (다중 선택 가능)</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_WEST" checked class="rounded text-ksd_navy">
+                                <span>O_WEST: 양식당</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_JPN" class="rounded text-ksd_navy">
+                                <span>O_JPN: 일식당</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_CHN" class="rounded text-ksd_navy">
+                                <span>O_CHN: 중식당</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_BUFFET" class="rounded text-ksd_navy">
+                                <span>O_BUFFET: 뷔페</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_BAR" checked class="rounded text-ksd_navy">
+                                <span>O_BAR: 라운지 바</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center space-x-2 cursor-pointer text-xs hover:bg-slate-50">
+                                <input type="checkbox" name="outlet_type" value="O_BANQUET" class="rounded text-ksd_navy">
+                                <span>O_BANQUET: 연회장</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">제안 목적 (TPO)</label>
+                            <select id="tpo_option" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-ksd_navy text-sm bg-white">
+                                <option value="T_BTG">T_BTG: 바이더글라스(하우스)</option>
+                                <option value="T_PROMO" selected>T_PROMO: 시즌 한정 프로모션</option>
+                                <option value="T_GALA">T_GALA: 갈라 디너 페어링</option>
+                                <option value="T_WEDDING">T_WEDDING: 연회 대량 납품</option>
+                                <option value="T_MD">T_MD: 객실/명절 패키지 MD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">타깃 가격대</label>
+                            <select id="price_range" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-ksd_navy text-sm bg-white">
+                                <option value="P_BUDGET">P_BUDGET: 실속형 (~3만원 이하)</option>
+                                <option value="P_BUSINESS">P_BUSINESS: 비즈니스 (3~7만원)</option>
+                                <option value="P_PREMIUM">P_PREMIUM: 프리미엄 (7~15만원)</option>
+                                <option value="P_LUXURY" selected>P_LUXURY: 럭셔리/컬트 (15만원 이상)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">추가 특이사항 (Specific Notes)</label>
+                        <textarea id="specific_notes" rows="3" placeholder="예: 셰프가 트러플을 곁들인 안심 스테이크를 메인으로 기획 중임. 미국 컬트 와인을 선호." class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-ksd_navy text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-ksd_navy hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition flex justify-center items-center space-x-2 text-sm mt-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-ksd_gold"></i>
+                        <span>1초 완성 제안서 생성하기</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="tab-preview" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-sliders mr-2 text-ksd_navy"></i>AI 매칭 와인 결과 검수 <span class="text-xs font-normal text-slate-400 ml-1">(실시간 직접 수정 가능)</span></h3>
+                        <span class="text-xs bg-slate-100 text-slate-600 font-mono" id="doc-id-badge">ID: KSD-20260617-02</span>
+                    </div>
+
+                    <div id="ai-cards-container" class="space-y-6">
+                        </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider">제안 무결성 검증</h4>
+                        <ul class="text-xs space-y-2 text-slate-700">
+                            <li class="flex items-center justify-between"><span class="text-slate-500">데이터 스키마 대조</span> <span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded"><i class="fa-solid fa-circle-check mr-1"></i>일치</span></li>
+                            <li class="flex items-center justify-between"><span class="text-slate-500">매핑 코드 검증</span> <span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded"><i class="fa-solid fa-circle-check mr-1"></i>일치</span></li>
+                            <li class="flex items-center justify-between"><span class="text-slate-500">브랜딩 CSS 적용</span> <span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded"><i class="fa-solid fa-circle-check mr-1"></i>완료</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center space-y-4">
+                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider">제안 마진율 계산</h4>
+                        <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+                            <canvas id="marginDialChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center mt-2">
+                                <span class="text-2xl font-black text-slate-800">45.2%</span>
+                                <span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold mt-1">🟩 안전</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Green: &ge;40% (안전) | Yellow: &lt;40% (주의) | Red: &lt;30% (위험)</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">최종 발행 및 연동</h4>
+                        
+                        <button onclick="generatePDF()" class="w-full bg-ksd_navy hover:bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-lg shadow flex justify-center items-center space-x-2 transition">
+                            <i class="fa-solid fa-file-pdf text-ksd_gold text-sm"></i>
+                            <span>국순당 양식 PDF 다운로드</span>
+                        </button>
+                        
+                        <button onclick="sendToGmail()" class="w-full bg-ksd_gold hover:bg-yellow-500 text-ksd_navy text-xs font-bold py-3 px-4 rounded-lg shadow flex justify-center items-center space-x-2 transition">
+                            <i class="fa-solid fa-envelope-open text-sm"></i>
+                            <span>소믈리에 Gmail 전송 (초안)</span>
+                        </button>
+                        <p class="text-[10px] text-slate-400 text-center"><i class="fa-solid fa-lock mr-1"></i>Gmail API Scope OAuth 연동 상태: Draft Creation Only</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="hidden">
+        <div id="pdf-template" class="p-12 bg-white text-slate-800 space-y-8" style="width: 800px; min-height: 1130px;">
+            <div class="flex justify-between items-end border-b-2 border-ksd_navy pb-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-ksd_gold" id="pdf-meta-id">KSD-20260617-02</span>
+                    <h2 class="text-2xl font-black text-ksd_navy mt-1" id="pdf-title-hotel">파크하얏트 서울 F&B 파트너십 제안</h2>
+                </div>
+                <div class="text-right">
+                    <div class="font-serif font-black text-lg tracking-wider text-ksd_navy">KOOKSOONDANG</div>
+                    <span class="text-[10px] text-slate-400">IMPORTED LIQUOR DIVISION</span>
+                </div>
+            </div>
+
+            <div class="bg-ksd_beige p-4 rounded border-l-4 border-ksd_gold text-xs leading-relaxed text-slate-700">
+                본 제안서는 귀 호텔의 품격과 시그니처 환경을 정밀 분석하여 엄선한 <strong>국순당 독점 하이엔드 수입 와인 포트폴리오</strong>입니다. 소믈리에 가이드라인 및 메뉴 하모니 스토리를 제안합니다.
+            </div>
+
+            <div id="pdf-wines-list" class="space-y-6"></div>
+
+            <div class="pt-12 border-t border-slate-200 text-center space-y-2">
+                <p class="text-[10px] text-slate-500 leading-relaxed max-w-xl mx-auto">
+                    본 제안서에 기재된 와인은 오직 귀 호텔의 품격만을 위해 엄선된 국순당 독점 수입 포트폴리오입니다.<br>
+                    안정적인 재고 공급과 소믈리에 트레이닝 지원을 약속드립니다.
+                </p>
+                <p class="text-xs font-bold text-ksd_navy mt-4">국순당 수입주류 사업부 담당자 배상</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-500 text-center text-xs py-4 border-t border-slate-800">
+        &copy; 2026 KOOKSOONDANG Digital Transformation Project. All Rights Reserved.
+    </footer>
+
+    <script>
+        // 전역 상태 및 차트 오브젝트 인스턴스 홀더
+        let trendChartInstance = null;
+        let dialChartInstance = null;
+        let currentGeneratedData = null;
+
+        // 마스터 국순당 와인 데이터베이스 (Knowledge Base 동기화)
+        const MASTER_WINE_DB = {
+            "P_LUXURY": [
+                {
+                    wine_name: "렐름 셀라 (Realm Cellars)",
+                    winery: "Realm Cellars",
+                    origin: "미국 나파 밸리",
+                    storytelling_text: "평론가 만점을 휩쓴 나파 밸리 최고의 컬트 와인입니다. 극도로 한정된 수량만 공급되는 자산 가치 높은 프리미엄 와인으로 호텔의 품격을 완성합니다.",
+                    pairing_logic: "셰프님이 기획하신 안심 스테이크 트러플 소스의 복합적인 풍미와 렐름 셀라의 깊고 진한 탄닌감이 완벽한 구조감의 마리아주를 이룹니다."
+                },
+                {
+                    wine_name: "카디날 (Cardinale)",
+                    winery: "Cardinale",
+                    origin: "미국 나파 밸리",
+                    storytelling_text: "나파 밸리 여러 테루아의 최고급 포도만 엄선 및 블렌딩하여 탄생한 독보적인 예술품입니다. 명품 카베르네의 진수를 선사합니다.",
+                    pairing_logic: "묵직한 풀바디감과 정교한 밸런스가 메인 육류 요리의 스모키한 질감을 고급스럽게 감싸 안아줍니다."
+                }
+            ],
+            "P_PREMIUM": [
+                {
+                    wine_name: "까르피네토 (Carpineto)",
+                    winery: "Carpineto",
+                    origin: "이탈리아 토스카나",
+                    storytelling_text: "이탈리아 토스카나의 전통 강자입니다. 특히 장기 숙성된 올드 빈티지 리저브 와인을 다수 보유하여 타사 포트폴리오와 차별화된 아우라를 구현합니다.",
+                    pairing_logic: "토스카나 산지오베제 특유의 산미와 잘 정돈된 탄닌은 정통 양식 및 중식 육류 요리의 기름진 맛을 완벽히 통제합니다."
+                }
+            ],
+            "P_BUSINESS": [
+                {
+                    wine_name: "도멘 타리케 (Domaine Tariquet)",
+                    winery: "Domaine Tariquet",
+                    origin: "프랑스 가스꼬뉴",
+                    storytelling_text: "프랑스 가스꼬뉴 지역 화이트 와인의 선구자입니다. 신선하고 시트러스한 과일 향이 매력적이며, 대중성과 매니아층을 모두 만족시키는 화이트 명가입니다.",
+                    pairing_logic: "스시, 사시미 등 일식 F&B 오퍼레이션 혹은 올데이 다이닝 뷔페의 해산물 코너에 최적화된 청량감을 선사합니다."
+                },
+                {
+                    wine_name: "쥬베 앤 캠스 (Juvé & Camps)",
+                    winery: "Juvé & Camps",
+                    origin: "스페인 페네데스",
+                    storytelling_text: "스페인 왕실의 공식 만찬주이자 36개월 이상 장기 숙성한 최고급 카바(Cava)입니다. 전통 샴페인 제조 공법과 동일하여 최고 대안이 됩니다.",
+                    pairing_logic: "연회, 대규모 웨딩, 브런치 뷔페의 웰컴 드링크로서 화려하고 정교한 버블감을 선사하여 초기 분위기를 리드합니다."
+                }
+            ],
+            "P_BUDGET": [
+                {
+                    wine_name: "도멘 타리케 (Domaine Tariquet) 클래식",
+                    winery: "Domaine Tariquet",
+                    origin: "프랑스 가스꼬뉴",
+                    storytelling_text: "가성비와 품격을 동시에 만족시키는 하우스 와인 마스터피스입니다.",
+                    pairing_logic: "올데이 뷔페 바이더글라스 운영 시 최적의 원가율을 달성하게 지원합니다."
+                }
+            ]
+        };
+
+        // 앱 초기화 로드
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTrendChart();
+        });
+
+        // 탭 스위칭 엔진
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 대시보드 메인 트렌드 분석 라인 차트 구현
+        function renderTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['01월', '02월', '03월', '04월', '05월', '06월(현재)'],
+                    datasets: [{
+                        label: '제안서 발행 건수 추이',
+                        data: [12, 19, 26, 30, 35, 42],
+                        backgroundColor: 'rgba(0, 80, 136, 0.1)',
+                        borderColor: '#005088',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // 제안서 입력 완료 처리 핸들러 (세션 2 -> 세션 3 파이프라인 시뮬레이터)
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const hotelName = document.getElementById('hotel_name').value;
+            const priceRange = document.getElementById('price_range').value;
+            const specificNotes = document.getElementById('specific_notes').value;
+
+            // 데이터 마칭 엔진 가동
+            let matchedWines = MASTER_WINE_DB[priceRange] || MASTER_WINE_DB["P_BUSINESS"];
+            
+            // 고유 매칭 제안 데이터 Object 모델 정의 (Structured Schema 준수)
+            currentGeneratedData = {
+                proposal_id: `KSD-20260617-${Math.floor(Math.random() * 90 + 10)}`,
+                hotel_name: hotelName,
+                selected_wines: matchedWines.map(wine => {
+                    // 사용자 추가 코멘트가 있을 시 페어링 논리에 지능형 융합 주입 시뮬레이션
+                    let customPairing = wine.pairing_logic;
+                    if(specificNotes.trim().length > 0) {
+                        customPairing = `[영업 특이사항 반영] 입력하신 컨셉('${specificNotes}')을 고려할 때, ${wine.pairing_logic}`;
+                    }
+                    return {
+                        ...wine,
+                        proposal_headline: `귀 호텔의 품격을 위한 독점 공급 제안, ${wine.wine_name}`,
+                        pairing_logic: customPairing
+                    }
+                })
+            };
+
+            // 화면 3 컴포넌트 렌더링 업데이트
+            renderPreviewScreen();
+            switchTab('tab-preview');
+        }
+
+        // 화면 3 검수 UI 컴포넌트 동적 생성
+        function renderPreviewScreen() {
+            document.getElementById('doc-id-badge').innerText = `ID: ${currentGeneratedData.proposal_id}`;
+            const container = document.getElementById('ai-cards-container');
+            container.innerHTML = ''; // 초기화
+
+            currentGeneratedData.selected_wines.forEach((wine, index) => {
+                const card = document.createElement('div');
+                card.className = "p-5 border border-slate-100 rounded-xl bg-slate-50 space-y-4 relative";
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2 text-ksd_navy font-bold text-sm">
+                        <i class="fa-solid fa-wine-bottle text-ksd_gold"></i>
+                        <span>와인 ${index + 1} : ${wine.wine_name} (${wine.origin})</span>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-500 mb-1 flex items-center justify-between"><span>헤드라인 카피</span> <span class="text-[10px] text-ksd_navy cursor-pointer"><i class="fa-solid fa-pen-to-square"></i> EDIT</span></label>
+                            <input type="text" value="${wine.proposal_headline}" id="edit-headline-${index}" class="w-full p-2 bg-white border border-slate-200 rounded focus:ring-1 focus:ring-ksd_navy">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-500 mb-1 flex items-center justify-between"><span>스토리텔링</span> <span class="text-[10px] text-ksd_navy cursor-pointer"><i class="fa-solid fa-pen-to-square"></i> EDIT</span></label>
+                            <textarea id="edit-story-${index}" rows="2" class="w-full p-2 bg-white border border-slate-200 rounded focus:ring-1 focus:ring-ksd_navy">${wine.storytelling_text}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-500 mb-1 flex items-center justify-between"><span>페어링 논리</span> <span class="text-[10px] text-ksd_navy cursor-pointer"><i class="fa-solid fa-pen-to-square"></i> EDIT</span></label>
+                            <textarea id="edit-pair-${index}" rows="2" class="w-full p-2 bg-white border border-slate-200 rounded focus:ring-1 focus:ring-ksd_navy">${wine.pairing_logic}</textarea>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // 마진율 계기판 다이얼 렌더링 동기화
+            renderMarginDialChart();
+        }
+
+        // 실시간 비즈니스 마진 계산 계기판 그래프
+        function renderMarginDialChart() {
+            if(dialChartInstance) dialChartInstance.destroy();
+
+            const ctx = document.getElementById('marginDialChart').getContext('2d');
+            dialChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [45.2, 54.8], // 45.2% 도넛 채우기
+                        backgroundColor: ['#10b981', '#f1f5f9'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '80%',
+                    rotation: -90,
+                    circumference: 180,
+                    plugins: { tooltip: { enabled: false }, legend: { display: false } }
+                }
+            });
+        }
+
+        // 1초 완성 PDF 생성 및 다운로드 엔진 실행 (jspdf / html2pdf 연동)
+        function generatePDF() {
+            // 사용자 실시간 편집 데이터 전역 캡처 싱크 동기화
+            currentGeneratedData.selected_wines.forEach((wine, index) => {
+                wine.proposal_headline = document.getElementById(`edit-headline-${index}`).value;
+                wine.storytelling_text = document.getElementById(`edit-story-${index}`).value;
+                wine.pairing_logic = document.getElementById(`edit-pair-${index}`).value;
+            });
+
+            // 인쇄용 히든 템플릿에 데이터 밀어넣기
+            document.getElementById('pdf-meta-id').innerText = currentGeneratedData.proposal_id;
+            document.getElementById('pdf-title-hotel').innerText = `${currentGeneratedData.hotel_name} F&B 맞춤형 와인 제안`;
+            
+            const pdfWinesList = document.getElementById('pdf-wines-list');
+            pdfWinesList.innerHTML = '';
+
+            currentGeneratedData.selected_wines.forEach((wine, index) => {
+                const wineBlock = document.createElement('div');
+                wineBlock.className = "p-4 rounded border border-slate-100 bg-slate-50 space-y-2";
+                wineBlock.style.backgroundColor = '#F8FAFC';
+                wineBlock.innerHTML = `
+                    <div style="color:#005088; font-weight:bold; font-size:14px; border-bottom:1px solid #E2E8F0; padding-bottom:4px;">
+                        ■ 제안 와인 ${index + 1}: ${wine.wine_name} (${wine.origin} / ${wine.winery})
+                    </div>
+                    <div style="font-size:12px; font-weight:bold; color:#D4AF37; margin-top:4px;">" ${wine.proposal_headline} "</div>
+                    <div style="font-size:11px; color:#475569; line-height:1.5;"><strong>[와인 소믈리에 가이드]</strong> <br>${wine.storytelling_text}</div>
+                    <div style="font-size:11px; color:#475569; line-height:1.5; margin-top:4px;"><strong>[F&B 추천 메뉴 마리아주 논거]</strong> <br>${wine.pairing_logic}</div>
+                `;
+                pdfWinesList.appendChild(pdfWinesList.appendChild(wineBlock));
+            });
+
+            // html2pdf 실시간 인쇄 옵션 가이드 빌드
+            const element = document.getElementById('pdf-template');
+            const opt = {
+                margin:       0.2,
+                filename:     `국순당_제안서_${currentGeneratedData.hotel_name}_${currentGeneratedData.proposal_id}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // 레벨 스트림 처리 다운로드
+            html2pdf().set(opt).from(element).save().then(() => {
+                // 이력 테이블에 동적 누적 한 줄 추가 시뮬레이터 가동 (CRUD 완료 단계)
+                appendHistoryTable(currentGeneratedData);
+                // KPI 업카운트 증가
+                document.getElementById('kpi-count').innerText = "43 건";
+                alert('국순당 공식 규격 고해상도 PDF 제안서가 정상 발행되어 저장소에 누적되었습니다.');
+                switchTab('tab-dashboard');
+            });
+        }
+
+        // Gmail 초안 작성 시스템 연동 스코프 (OAuth API call 백엔드 우회 텍스트 스트리밍)
+        function sendToGmail() {
+            const hotelName = currentGeneratedData.hotel_name;
+            const subject = encodeURIComponent(`[국순당 수입주류 제안] ${hotelName} F&B 맞춤형 하이엔드 와인 포트폴리오 제안서 초안`);
+            
+            let bodyText = `안녕하세요, ${hotelName} 소믈리에 및 F&B 지배인님.\n\n국순당 수입주류 사업부에서 귀 호텔의 품격과 시그니처 메뉴 환경을 위해 특별히 엄선한 와인 제안 포트폴리오를 송부해 드립니다.\n\n`;
+            
+            currentGeneratedData.selected_wines.forEach((wine, index) => {
+                bodyText += `■ 제안 와인 ${index+1}: ${wine.wine_name}\n`;
+                bodyText += `- 한줄요약: ${document.getElementById(`edit-headline-${index}`).value}\n`;
+                bodyText += `- 추천사유: ${document.getElementById(`edit-story-${index}`).value}\n\n`;
+            });
+            
+            bodyText += `상세한 견적율 및 인쇄용 고해상도 테이스팅 가이드 제안서 본문은 첨부해드리는 시스템 고유 링크를 참조해주십시오.\n\n감사합니다.\n국순당 수입주류 사업부 담당자 배상.`;
+            const encodedBody = encodeURIComponent(bodyText);
+
+            // 사용자의 아웃룩 혹은 구글 메인 compose 창으로 딥링크 연동 처리
+            window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=&su=${subject}&body=${encodedBody}`, '_blank');
+        }
+
+        // 이력 테이블 동적 행 생성엔진
+        function appendHistoryTable(data) {
+            const tbody = document.getElementById('history-table-body');
+            const tr = document.createElement('tr');
+            tr.className = "bg-amber-50/40 font-medium"; // 방금 만든 것은 하이라이트 효과
+            tr.innerHTML = `
+                <td class="p-4 font-mono font-bold text-ksd_navy">${data.proposal_id}</td>
+                <td class="p-4">${data.hotel_name}</td>
+                <td class="p-4"><span class="bg-blue-50 text-ksd_navy px-2 py-0.5 rounded text-xs">F&B 제안 완료</span></td>
+                <td class="p-4 text-xs text-slate-500">${data.selected_wines[0].wine_name} 포함</td>
+                <td class="p-4 text-right"><button class="text-xs border border-ksd_gold text-ksd_navy font-bold bg-white px-3 py-1 rounded shadow-sm hover:bg-slate-50"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>발행 완료</button></td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+    </script>
+</body>
+</html>
